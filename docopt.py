@@ -441,7 +441,7 @@ class Dict(dict):
         return '{%s}' % ',\n '.join('%r: %r' % i for i in sorted(self.items()))
 
 
-def docopt(doc, argv=sys.argv[1:], help=True, version=None):
+def docopt(doc, argv=sys.argv[1:], help=True, version=None, flat_output=True):
     DocoptExit.usage = printable_usage(doc)
     options = parse_doc_options(doc)
     pattern = parse_pattern(formal_usage(DocoptExit.usage), options)
@@ -449,5 +449,10 @@ def docopt(doc, argv=sys.argv[1:], help=True, version=None):
     extras(help, version, argv, doc)
     matched, left, collected = pattern.fix().match(argv)
     if matched and left == []:  # better error message if left?
-        return Dict((a.name, a.value) for a in (pattern.flat + options + collected))
+        if flat_output:
+            return (Dict((a.name, a.value) for a in (pattern.flat
+                    + options + collected)))
+        else:
+            return (Dict((a.name, a.value) for a in (pattern.flat + options)),
+                    Dict((a.name, a.value) for a in collected))
     raise DocoptExit()

@@ -553,3 +553,11 @@ def test_multiple_different_elements():
     assert docopt('usage: prog (go <direction> --speed=<km/h>)...',
                   'go left --speed=5  go right --speed=9') == \
             {'go': 2, '<direction>': ['left', 'right'], '--speed': ['5', '9']}
+
+def test_breaking_out_defaults_from_explicit_args():
+    doc = """Usage: tau [-a <host:port>]
+
+    -a, --address <host:port>  TCP address [default: localhost:6283].
+
+    """
+    assert docopt(doc, '--address localhost:8000', flat_output=False) == ({'--address': 'localhost:6283'}, {'--address': 'localhost:8000'})
